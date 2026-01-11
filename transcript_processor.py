@@ -20,7 +20,7 @@ def get_embeddings():
     return OpenAIEmbeddings()
 
 
-@st.cache_data(show_spinner=False)
+@st.cache_resource(show_spinner=False)
 def create_vector_db_from_youtube(video_url: str) -> FAISS:
     """
     Create a FAISS vector database from YouTube video transcript
