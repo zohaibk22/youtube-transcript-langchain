@@ -1,17 +1,17 @@
-from langchain.document_loaders import YoutubeLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.llms import OpenAI
-from langchain import PromptTemplate
-from langchain.chains import LLMChain
+from langchain_community.document_loaders import YoutubeLoader
+
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_openai import OpenAI, OpenAIEmbeddings
+from langchain_core.prompts import PromptTemplate
+# from langchain.chains import LLMChain
 from langchain_community.vectorstores import FAISS
 from dotenv import load_dotenv
-from langchain_openai import OpenAIEmbeddings
 
 
 load_dotenv()
 
 embeddings = OpenAIEmbeddings()
-video_url =  "https://www.youtube.com/watch?v=SeZW3nNf3R0"
+video_url =  ""
 def create_vector_db_from_youtube(video_url: str) -> FAISS:
     print(video_url, "video url")
     loader = YoutubeLoader.from_youtube_url(video_url)
@@ -24,10 +24,6 @@ def create_vector_db_from_youtube(video_url: str) -> FAISS:
     
     return db
 
-
-
-test=create_vector_db_from_youtube(video_url)
- 
 
 def get_response_from_query(db, query, k=4):
     # text-davini can handle 
@@ -55,13 +51,8 @@ def get_response_from_query(db, query, k=4):
         """,
        )
    
-   chain = LLMChain(llm=llm, prompt=prompt)
+   chain = prompt | llm
    
-   response = chain.run(question=query, docs=docs_page_content)
+   response = chain.invoke({"question": query, "docs": docs_page_content})
    response = response.replace("\n", "")
-   print(response, "IS RESPONSE INSIDE get response func")
    return response, docs
-   
-   
-   
-print(get_response_from_query(test, 'test'))
